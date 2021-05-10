@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ /*
+  ~ *  Created Zaeem Sattar on 3/23/21 9:10 PM
+  ~ *  Copyright Ⓒ 2021. All rights reserved Ⓒ Zaeem Sattar
+  ~ *  Last modified: 3/23/21 9:00 PM
+  ~ */
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zaeem.routy">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+</manifest>

@@ -1,0 +1,12 @@
+<!--
+  ~ /*
+  ~ *  Created Zaeem Sattar on 3/23/21 9:10 PM
+  ~ *  Copyright Ⓒ 2021. All rights reserved Ⓒ Zaeem Sattar
+  ~ *  Last modified: 3/23/21 7:22 PM
+  ~ */
+  -->
+
+<resources>
+    <string name="app_name">Routy</string>
+    <string name="title_activity_maps">Map</string>
+</resources>

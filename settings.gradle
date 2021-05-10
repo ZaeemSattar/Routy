@@ -1,0 +1,11 @@
+/*
+ *
+ *   Created Zaeem Sattar on 3/23/21 9:10 PM
+ *   Copyright Ⓒ 2021. All rights reserved Ⓒ Zaeem Sattar
+ *   Last modified: 3/23/21 7:22 PM
+ * /
+ */
+
+include ':routy'
+include ':app'
+rootProject.name = "Routy"
