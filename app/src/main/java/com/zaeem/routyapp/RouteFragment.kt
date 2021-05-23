@@ -9,21 +9,16 @@
 package com.zaeem.routyapp
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import drawMarker
 import drawRouteOnMap
-import getTravelEstimations
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import moveCameraOnMap
 
@@ -51,11 +46,19 @@ class RouteFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(p0: GoogleMap?) {
         this.googleMap = p0
 
-        val source = LatLng(31.490127, 74.316971) //starting point (LatLng)
-        val destination = LatLng(31.474316, 74.316112) // ending point (LatLng)
+
+        /*doctor hospital to emporium*/
+        val source = LatLng(31.478889, 74.281629) //starting point (LatLng)
+        val destination = LatLng(31.468462, 74.266985) // ending point (LatLng)
+
+
+        /*Hamid latif to jinnah hospital*/
+        val sourceNew = LatLng(31.518957, 74.335228) //starting point (LatLng)
+        val destinationNew = LatLng(31.486838, 74.293533) // ending point (LatLng)
 
         //if you only want the Estimates (Distance & Time of arrival)
 
+/*
         GlobalScope.launch {
             getTravelEstimations(
                 mapsApiKey = getString(R.string.google_maps_key),
@@ -71,52 +74,53 @@ class RouteFragment : Fragment(), OnMapReadyCallback {
                 } ?: Log.e(TAG, "Nothing found")
             }
         }
+*/
 
 
-        /* googleMap?.run {
-             //if you want to move the map on specific location
-             moveCameraOnMap(latLng = source)
+        googleMap?.run {
+            //if you want to move the map on specific location
+//            moveCameraOnMap(latLng = source)
 
-             //if you want to drop a marker of maps, call it
-             drawMarker(location = source, context = requireContext(), title = "test marker")
+            //if you want to drop a marker of maps, call it
+            /* drawMarker(location = source, context = requireContext(), title = "test marker")*/
 
-             //if you only want to draw a route on maps
-             //Called the drawRouteOnMap extension to draw the polyline/route on google maps
+            //if you only want to draw a route on maps
+            //Called the drawRouteOnMap extension to draw the polyline/route on google maps
 
 
-             lifecycleScope.launch {
-                 drawRouteOnMap(
-                     getString(R.string.google_maps_key),
-                     source = source,
-                     destination = destination,
-                     context = context!!,
+            lifecycleScope.launch {
+                drawRouteOnMap(
+                    getString(R.string.google_maps_key),
+                    source = sourceNew,
+                    destination = destinationNew,
+                    context = context!!,
 
-                     )
-             }
+                    )
+            }
 
-             //if you only want to draw a route on maps and also need the ETAs then implement the EstimationsCallBack and pass the ref like this
-             //Called the drawRouteOnMap extension to draw the polyline/route on google maps
+            //if you only want to draw a route on maps and also need the ETAs then implement the EstimationsCallBack and pass the ref like this
+            //Called the drawRouteOnMap extension to draw the polyline/route on google maps
 
-             lifecycleScope.launch {
-                 drawRouteOnMap(
-                     getString(R.string.google_maps_key),
-                     source = source,
-                     destination = destination,
-                     context = context!!,
-                     routeEstimations = { estimations ->
-                         {
+            /*   lifecycleScope.launch {
+                   drawRouteOnMap(
+                       getString(R.string.google_maps_key),
+                       source = source,
+                       destination = destination,
+                       context = context!!,
+                       routeEstimations = { estimations ->
+                           {
 
-                         }
-                     }, polylinePoints = { points ->
+                           }
+                       }, polylinePoints = { points ->
 
-                     }
-                 )
-             }
-
-         }*/
+                       }
+                   )
+               }
+*/
+        }
     }
 
     companion object {
-        var TAG = RouteFragment::javaClass.name
+        var TAG = "ROUTY_TAG"
     }
 }

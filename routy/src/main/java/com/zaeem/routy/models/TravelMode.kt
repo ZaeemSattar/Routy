@@ -11,3 +11,8 @@ package com.zaeem.routy.models
 enum class TravelMode {
     DRIVING, WALKING, BICYCLING, TRANSIT
 }
+
+enum class RoutingMethod {
+    Route,
+    POINTS
+}

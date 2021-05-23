@@ -13,20 +13,21 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
-import com.zaeem.routy.factory.DirectionFactory
 import com.zaeem.routy.R
 import com.zaeem.routy.extensions.getColorCompat
+import com.zaeem.routy.factory.DirectionFactory
 import com.zaeem.routy.models.Legs
-import com.zaeem.routy.models.Route
 import com.zaeem.routy.models.Routes
+import com.zaeem.routy.models.RoutingMethod
 import com.zaeem.routy.models.TravelMode
 import com.zaeem.routy.parser.RouteGsonParser
 import com.zaeem.routy.routing.RouteDrawer
-import com.zaeem.routy.routing.DirectionApiApiImpl
 import com.zaeem.routy.utils.MapUtils
 import com.zaeem.routy.utils.PolylineDecoder
 import kotlinx.coroutines.*
 
+
+const val TAG = "ROUTY_TAG"
 
 /**
  * Extension function to draw a marker.
@@ -95,6 +96,7 @@ fun GoogleMap.moveCameraOnMap(
  * estimations: ((Legs?) -> Unit)? = null //To get the Estimations(Time of arrival and distance) please call the lambda to get the values
  * @author Zaeem Sattar.
  */
+
 suspend fun GoogleMap.drawRouteOnMap(
     apiKey: String,
     context: Context,
@@ -105,6 +107,7 @@ suspend fun GoogleMap.drawRouteOnMap(
     boundMarkers: Boolean = true,
     polygonWidth: Int = 7,
     travelMode: TravelMode = TravelMode.DRIVING,
+    routingMethod: RoutingMethod = RoutingMethod.POINTS,
     defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
     routeEstimations: ((legs: Legs?) -> Unit)? = null,
     polylinePoints: ((List<LatLng>) -> Unit)? = null
@@ -140,23 +143,43 @@ suspend fun GoogleMap.drawRouteOnMap(
             val r = RouteGsonParser<Routes>().parse(response, Routes::class.java)
             val routes = r.routes
 
-            if (!routes.isNullOrEmpty()) {
-                routes[0].legs?.get(0)?.let {
-                    routeEstimations?.invoke(it)
-                }
-                routes[0].overview_polyline?.points?.let {
-                    PolylineDecoder().decodePolyline(it).let { decodedPoints ->
-                        if (decodedPoints.isNotEmpty()) {
-                            polylinePoints?.invoke(decodedPoints)
+            withContext(Dispatchers.Main)
+            {
+                when (routingMethod) {
+                    RoutingMethod.POINTS -> {
+
+                        if (!routes.isNullOrEmpty()) {
+
+                            routes[0].overview_polyline?.points?.let {
+                                PolylineDecoder().decodePolyline(it).let { decodedPoints ->
+                                    if (decodedPoints.isNotEmpty()) {
+                                        polylinePoints?.invoke(decodedPoints)
+                                        routeDrawer.drawPath(decodedPoints)
+
+                                    }
+                                }
+                            }
+
+
+                        }
+
+                    }
+                    RoutingMethod.Route -> {
+                        routeDrawer.drawPath(r)
+
+                        if (!routes.isNullOrEmpty()) {
+                            routes[0].legs?.get(0)?.let {
+                                routeEstimations?.invoke(it)
+                            }
+
                         }
                     }
                 }
 
-                routeDrawer.drawPath(r)
-                // if user requires to bound the markers with padding
-                if (boundMarkers)
-                    boundMarkersOnMap(arrayListOf(source, destination))
             }
+
+            if (boundMarkers)
+                boundMarkersOnMap(arrayListOf(source, destination))
         }
 
     }
@@ -174,6 +197,7 @@ in your activity and get the ETA, don't forget to implement the Estimations inte
  * @param estimates lambda to get the estimates data from google
  * @author Zaeem Sattar.
  */
+
 suspend fun getTravelEstimations(
     mapsApiKey: String,
     source: LatLng,
@@ -212,15 +236,19 @@ suspend fun getTravelEstimations(
  * @param latLng array of all the latlng that are required to bound.
  * @author Zaeem Sattar.
  */
-fun GoogleMap.boundMarkersOnMap(
+suspend fun GoogleMap.boundMarkersOnMap(
     latLng: ArrayList<LatLng>,
-    padding: Int = 5
+    padding: Int = 50
 ) {
-    val builder = LatLngBounds.Builder()
-    for (marker in latLng) {
-        builder.include(marker)
+    withContext(Dispatchers.Main)
+    {
+        val builder = LatLngBounds.Builder()
+        for (marker in latLng) {
+            builder.include(marker)
+        }
+        val bounds = builder.build()
+        val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+        moveCamera(cameraUpdate)
     }
-    val bounds = builder.build()
-    val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding)
-    moveCamera(cameraUpdate)
+
 }
